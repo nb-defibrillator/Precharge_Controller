@@ -9,10 +9,20 @@ uint8_t Switch2 = 8;
 
 bool carRunning = false;
 
-unsigned long prechargeStart=-1;
-const unsigned long prechargeTime = 5e5; // 0.5s -- amount of time necessary to precharge
+unsigned long prechargeStart = 0;
+const unsigned long prechargeTime = 5e6; // 5s -- amount of time necessary to precharge 
 
-
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(AIR_Precharge, OUTPUT);    
+  pinMode(AIR_Main, OUTPUT);
+  pinMode(AIR_Negative, OUTPUT);
+  pinMode(AIR_Discharge, OUTPUT);
+  pinMode(LED_Discharge, OUTPUT);
+  
+  pinMode(BMS, INPUT);
+  pinMode(Switch2, INPUT);
+}
 
 void precharge() {
 
@@ -29,17 +39,7 @@ void fault() {
   //still not sure what this should do
 }
 
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(AIR_Precharge, OUTPUT);    
-  pinMode(AIR_Main, OUTPUT);
-  pinMode(AIR_Negative, OUTPUT);
-  pinMode(AIR_Discharge, OUTPUT);
-  pinMode(LED_Discharge, OUTPUT);
-  
-  pinMode(BMS, INPUT);
-  pinMode(Switch2, INPUT);
-}
+
 
 void loop() {
   // put your main code here, to run repeatedly:
