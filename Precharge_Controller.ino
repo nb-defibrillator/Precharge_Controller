@@ -1,4 +1,4 @@
-uint8_t AIR_Precharge = 2;
+uint8_t AIR_Precharge = 2; 
 uint8_t AIR_Main = 3;
 uint8_t AIR_Negative = 4;
 uint8_t AIR_Discharge = 5;
@@ -13,8 +13,8 @@ bool prechargeFailed = false;
 bool dischargeFinished = false;
 
 unsigned long prechargeStart=-1;
-const unsigned long prechargeTimeout = 5e6; // 5s
-const unsigned long prechargeTime = 5e5; // 0.5s
+const unsigned long prechargeTimeout = 5e6; // 5s ---amount of time that has to pass to mean the precharge failed
+const unsigned long prechargeTime = 5e5; // 0.5s -- amount of time necessary to precharge
 unsigned long lastValidStart = -1; 
 
 unsigned long dischargeStart = -1;
@@ -23,26 +23,35 @@ const unsigned long dischargeInterval = 7.79e7; // 77.9s
 
 
 void precharge() {
-  if (~prechargeFailed){
-    digitalWrite(AIR_Precharge, HIGH);
-    digitalWrite(AIR_Negative, HIGH);
+  /**
+  Precharge function for the circuit.
+
+  if precharge failed -> deactivates AIRS Precharge and Negative.
+  if Optocoupler sends signal -> if has been precharging for enough time -> start car; deactivate AIR Precharge.
+  */
+  if (prechargeFailed){ 
+    digitalWrite(AIR_Precharge, LOW);
+    digitalWrite(AIR_Negative, LOW);
   }
-  if (digitalRead(Optocoupler)) {
+  if (digitalRead(Optocoupler)) { //if Optocoupler is active
     unsigned long now = micros();
     
     //This part waits for a steady signal from the optocoupler, 
     //current duration .5s but that's just a guess.
     if (lastValidStart == -1) lastValidStart = now;
-    else if (now - lastValidStart > prechargeTime) {
+    if (now - lastValidStart > prechargeTime) {
       carRunning = true;
       digitalWrite(AIR_Precharge, LOW);
     }
-    //timeout check
-    else if (now - prechargeStart > prechargeTimeout) { 
-      prechargeFailed = true;
-      fault();
+  } else{ 
+      lastValidStart = -1;
+      
+      //timeout check
+      if (now - prechargeStart > prechargeTimeout) { 
+        prechargeFailed = true;
+        fault();
+      }
     }
-  } else lastValidStart = -1;
 }
 
 void discharge() {
@@ -75,13 +84,16 @@ void loop() {
   // put your main code here, to run repeatedly:
   if (carRunning == false) {
       if (digitalRead(Switch2) == HIGH && digitalRead(BMS) == HIGH) {
-        if (prechargeStart == -1) prechargeStart = micros();
+        if (prechargeStart == -1) {            
+            digitalWrite(AIR_Precharge, HIGH);
+            digitalWrite(AIR_Negative, HIGH);
+            prechargeStart = micros();}
         precharge();
       }
   }
   else {
-    if (~Switch2) {
-      if (dischargeStart = -1) dischargeStart = micros();
+    if (!Switch2) {
+      if (dischargeStart == -1) dischargeStart = micros();
       if (dischargeFinished == false) discharge();
     }
   }
