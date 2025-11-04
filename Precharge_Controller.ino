@@ -60,6 +60,7 @@ void precharge() {
     if (chargingInterval > prechargeInterval) {
       carRunning = true;
       digitalWrite(AIR_Precharge, LOW);
+      digitalWrite(AIR_Main, HIGH);
     }
   } 
 
