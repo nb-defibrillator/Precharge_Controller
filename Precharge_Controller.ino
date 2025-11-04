@@ -1,23 +1,25 @@
+/***/
+
 #define ULONG_MAX 4294967295UL
 
+//pin IDs
 uint8_t AIR_Precharge = 2; 
 uint8_t AIR_Main = 3;
-uint8_t AIR_Negative = 4;
 uint8_t AIR_Discharge = 5;
 uint8_t LED_Discharge = 9;
+uint8_t LED_Fault = 10; //TODO: Pick actual pin id
 
 uint8_t Optocoupler = 6;
 uint8_t BMS = 7;
 uint8_t Switch2 = 8;
 
-bool carRunning = false;
-bool prechargeFailed = false;
-bool dischargeFinished = false;
+bool carRunning = false; //True when the car can start driving ; as in, when precharging has finished and is successful.
+bool prechargeFailed = false; //True if the precharge failed.
+bool dischargeFinished = false; // True if the discharge finished!
 
 //All measurements of time are in milliseconds!
 
-
-unsigned long prechargeStart = ULONG_MAX; // The time at which precharge started; in millis
+unsigned long prechargeStart = ULONG_MAX; // The time at which precharge started; in millis; ULONG_MAX acts as a 'null' here.
 const unsigned long prechargeTimeoutInterval = 10e4; // 10s ---amount of time that has to pass to mean the precharge failed; in millis
 const unsigned long prechargeInterval = 1.5e4; // 1.5s -- amount of time necessary to precharge; in millis
 
@@ -44,12 +46,13 @@ void precharge() {
   /**
   Precharge function for the circuit.
 
-  if precharge failed -> deactivates AIRS Precharge and Negative.
+  if precharge failed -> deactivates AIR Precharge.
   if Optocoupler sends signal -> if has been precharging for enough time -> start car; deactivate AIR Precharge.
   */
 
+  unsigned long now = millis();
   if (digitalRead(Optocoupler) == LOW) { //if Optocoupler is active
-    unsigned long now = millis();
+    
     
     //This part waits for a steady signal from the optocoupler, 
     //current duration .5s but that's just a guess.
@@ -70,9 +73,8 @@ void precharge() {
     // Timed out; precharge has failed! fault :(
     prechargeFailed = true;
     digitalWrite(AIR_Precharge, LOW);
-    digitalWrite(AIR_Negative, LOW);
     digitalWrite(AIR_Main, LOW);
-    digitalWrite(AIR_Discharge, LOW);
+    // digitalWrite(AIR_Discharge, LOW);
     fault();
   }
 }
@@ -94,9 +96,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   if (carRunning == false) {
       if (digitalRead(Switch2) == HIGH ) { //&& digitalRead(BMS) == HIGH
-        if (prechargeStart == ULONG_MAX) {            
-            digitalWrite(AIR_Precharge, HIGH);
-            digitalWrite(AIR_Negative, HIGH);
+        if (prechargeStart == ULONG_MAX) {   //if the prechargeStart hasn't yet been assigned         
+            digitalWrite(AIR_Precharge, HIGH); //Closes AIR precharge
             prechargeStart = millis();
             }
         precharge();
