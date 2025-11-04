@@ -1,15 +1,20 @@
-/***/
+/**
+Authors:
+Natu Benyam Demeke
+Violet Enslow
+Ryanne Wilson
+*/
 
 #define ULONG_MAX 4294967295UL
 
 //pin IDs
-uint8_t AIR_Precharge = 2; 
-uint8_t AIR_Main = 3;
-uint8_t AIR_Discharge = 5;
-uint8_t LED_Discharge = 9;
-uint8_t LED_Fault = 10; //TODO: Pick actual pin id
+const uint8_t AIR_Precharge = 2; 
+const uint8_t AIR_Main = 3;
+const uint8_t AIR_Discharge = 5;
+const uint8_t LED_Discharge = 9;
+const uint8_t LED_Fault = 10;
 
-uint8_t Optocoupler = 6;
+const uinst8_t Optocoupler = 14;
 uint8_t BMS = 7;
 uint8_t Switch2 = 8;
 
@@ -37,6 +42,7 @@ void setup() {
   //TODO: Add Fault LED
   pinMode(LED_Discharge, OUTPUT);
   pinMode(Optocoupler, INPUT_PULLUP); //Uses internal pullup resistors; default HIGH -> active LOW
+  pinMode(LED_Fault, OUTPUT);
   
   pinMode(BMS, INPUT);
   pinMode(Switch2, INPUT);
@@ -90,6 +96,7 @@ void discharge() {
 
 void fault() {
   //still not sure what this should do
+  digitalWrite(LED_Fault, HIGH);
 }
 
 void loop() {
