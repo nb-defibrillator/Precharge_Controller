@@ -54,7 +54,7 @@ void precharge() {
 
     unsigned long now = micros();
     
-    if (now - prechargeStart > prechargeTime) { //If it has been 7 seconds
+    if (now - prechargeStart > prechargeInterval) { //If it has been 7 seconds
       //Sets the car running; opens the precharge AIR, closes the main AIR
       carRunning = true;
       digitalWrite(AIR_Precharge, LOW);
