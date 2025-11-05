@@ -14,13 +14,6 @@ No comparator; instead, when switch 2 is flipped, closes the Precharge AIR for 7
 //pin IDs
 const uint8_t AIR_Precharge = 2; 
 const uint8_t AIR_Main = 3;
-const uint8_t AIR_Discharge = 5;
-const uint8_t LED_Discharge = 9;
-const uint8_t LED_Fault = 10;
-
-const uint8_t Optocoupler = 14;
-uint8_t BMS = 7;
-uint8_t Switch2 = 8;
 
 bool carRunning = false; //True when the car can start driving ; as in, when precharging has finished and is successful.
 bool prechargeFailed = false; //True if the precharge failed.
@@ -41,13 +34,6 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(AIR_Precharge, OUTPUT);     // Normally open- LOW = open, HIGH = closed
   pinMode(AIR_Main, OUTPUT);          // Normally open
-  pinMode(AIR_Discharge, OUTPUT);     // Normally open
-  pinMode(LED_Discharge, OUTPUT);
-  pinMode(Optocoupler, INPUT_PULLUP); //Uses internal pullup resistors; default HIGH -> active LOW
-  pinMode(LED_Fault, OUTPUT);
-  
-  pinMode(BMS, INPUT);
-  pinMode(Switch2, INPUT);
 }
 
 void precharge() {
@@ -66,13 +52,11 @@ void precharge() {
 void loop() {
   // put your main code here, to run repeatedly:
   if (carRunning == false) {
-      if (digitalRead(Switch2) == HIGH ) { //&& digitalRead(BMS) == HIGH
         if (prechargeStart == ULONG_MAX) {   //if the prechargeStart hasn't yet been assigned         
             digitalWrite(AIR_Precharge, HIGH); //Closes AIR precharge
             prechargeStart = millis();
             }
         precharge();
-      }
   }
 }
 
