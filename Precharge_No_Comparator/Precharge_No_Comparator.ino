@@ -12,7 +12,7 @@ No comparator; instead, when switch 2 is flipped, closes the Precharge AIR for 7
 #define ULONG_MAX 4294967295UL //Serves as a 'null' state for the timers
 
 //pin IDs
-const uint8_t AIR_Precharge = 2; 
+const uint8_t AIR_Precharge = 5; 
 const uint8_t AIR_Main = 3;
 
 bool carRunning = false; //True when the car can start driving ; as in, when precharging has finished and is successful.
@@ -23,7 +23,7 @@ bool dischargeFinished = false; // True if the discharge finished!
 
 unsigned long prechargeStart = ULONG_MAX; // The time at which precharge started; in millis; ULONG_MAX acts as a 'null' here.
 const unsigned long prechargeTimeoutInterval = 10e4; // 10s ---amount of time that has to pass to mean the precharge failed; in millis
-const unsigned long prechargeInterval = 1.5e4; // 1.5s -- amount of time necessary to precharge; in millis
+const unsigned long prechargeInterval = 7000; // 7s -- amount of time necessary to precharge; in millis
 
 unsigned long optocouplerActivatedStart = ULONG_MAX; // The time at which Optocoupler was active; in millis
 
@@ -34,17 +34,19 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(AIR_Precharge, OUTPUT);     // Normally open- LOW = open, HIGH = closed
   pinMode(AIR_Main, OUTPUT);          // Normally open
+  pinMode(13, OUTPUT);
 }
 
 void precharge() {
 
-    unsigned long now = micros();
+    unsigned long now = millis();
     
     if (now - prechargeStart > prechargeInterval) { //If it has been 7 seconds
       //Sets the car running; opens the precharge AIR, closes the main AIR
       carRunning = true;
       digitalWrite(AIR_Precharge, LOW);
       digitalWrite(AIR_Main, HIGH);
+      digitalWrite(13, HIGH);
     }
 
 }
