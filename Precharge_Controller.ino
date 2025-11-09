@@ -14,7 +14,7 @@ const uint8_t AIR_Discharge = 5;
 const uint8_t LED_Discharge = 9;
 const uint8_t LED_Fault = 10;
 
-const uinst8_t Optocoupler = 14;
+const uint8_t Optocoupler = 14;
 uint8_t BMS = 7;
 uint8_t Switch2 = 8;
 
